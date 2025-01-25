@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_file, render_template
 from invoice_generator import generate_invoice
 from io import BytesIO
+import traceback
 
 app = Flask(__name__)
 
@@ -12,29 +13,44 @@ def generate_invoice_endpoint():
             return jsonify({"error": "No data provided"}), 400
 
         pdf_buffer = generate_invoice(data)
-        return send_file(pdf_buffer, mimetype='application/pdf', as_attachment=True, download_name='invoice.pdf')
+        pdf_buffer.seek(0)
+
+        return send_file(
+            pdf_buffer,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name='invoice.pdf'
+        )
     except Exception as e:
+        print(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
 
 @app.route('/form', methods=['GET', 'POST'])
 def invoice_form():
     if request.method == 'POST':
         try:
+            items = []
+            for key, value in request.form.items():
+                if key.startswith('item') and '_desc' in key:
+                    index = key.split('_')[0][4:]
+                    items.append({
+                        "description": request.form[f"item{index}_desc"],
+                        "quantity": int(request.form.get(f"item{index}_qty", 0)),
+                        "unit_price": float(request.form.get(f"item{index}_price", 0.0))
+                    })
+
             data = {
                 "business_name": request.form['business_name'],
                 "business_address": request.form['business_address'],
                 "customer_name": request.form['customer_name'],
                 "customer_address": request.form['customer_address'],
-                "items": [
-                    {"description": request.form['item1_desc'], "quantity": int(request.form['item1_qty']), "unit_price": float(request.form['item1_price'])},
-                    {"description": request.form['item2_desc'], "quantity": int(request.form['item2_qty']), "unit_price": float(request.form['item2_price'])}
-                ],
+                "items": items,
                 "tax_rate": float(request.form['tax_rate'])
             }
-
             pdf_buffer = generate_invoice(data)
             return send_file(pdf_buffer, mimetype='application/pdf', as_attachment=True, download_name='invoice.pdf')
         except Exception as e:
+            print(traceback.format_exc())
             return jsonify({"error": str(e)}), 400
 
     return render_template('form.html')

@@ -4,6 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice Generator</title>
+    <script>
+        let itemIndex = 2;
+
+        function addItemRow() {
+            const container = document.getElementById('items-container');
+            const newRow = `
+                <div id="item-row-${itemIndex}">
+                    <label for="item${itemIndex}_desc">Item ${itemIndex} Description:</label>
+                    <input type="text" id="item${itemIndex}_desc" name="item${itemIndex}_desc"><br>
+                    <label for="item${itemIndex}_qty">Item ${itemIndex} Quantity:</label>
+                    <input type="number" id="item${itemIndex}_qty" name="item${itemIndex}_qty"><br>
+                    <label for="item${itemIndex}_price">Item ${itemIndex} Unit Price:</label>
+                    <input type="number" step="0.01" id="item${itemIndex}_price" name="item${itemIndex}_price"><br>
+                    <button type="button" onclick="removeItemRow(${itemIndex})">Remove</button>
+                    <br><br>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', newRow);
+            itemIndex++;
+        }
+
+        function removeItemRow(index) {
+            const row = document.getElementById(`item-row-${index}`);
+            if (row) {
+                row.remove();
+            }
+        }
+    </script>
 </head>
 <body>
     <h1>Invoice Generator</h1>
@@ -21,19 +49,18 @@
         <input type="text" id="customer_address" name="customer_address" required><br>
 
         <h2>Items</h2>
-        <label for="item1_desc">Item 1 Description:</label>
-        <input type="text" id="item1_desc" name="item1_desc" required><br>
-        <label for="item1_qty">Item 1 Quantity:</label>
-        <input type="number" id="item1_qty" name="item1_qty" required><br>
-        <label for="item1_price">Item 1 Unit Price:</label>
-        <input type="number" step="0.01" id="item1_price" name="item1_price" required><br>
-
-        <label for="item2_desc">Item 2 Description:</label>
-        <input type="text" id="item2_desc" name="item2_desc"><br>
-        <label for="item2_qty">Item 2 Quantity:</label>
-        <input type="number" id="item2_qty" name="item2_qty"><br>
-        <label for="item2_price">Item 2 Unit Price:</label>
-        <input type="number" step="0.01" id="item2_price" name="item2_price"><br>
+        <div id="items-container">
+            <div id="item-row-1">
+                <label for="item1_desc">Item 1 Description:</label>
+                <input type="text" id="item1_desc" name="item1_desc" required><br>
+                <label for="item1_qty">Item 1 Quantity:</label>
+                <input type="number" id="item1_qty" name="item1_qty" required><br>
+                <label for="item1_price">Item 1 Unit Price:</label>
+                <input type="number" step="0.01" id="item1_price" name="item1_price" required><br>
+            </div>
+        </div>
+        <button type="button" onclick="addItemRow()">Add Item</button>
+        <br><br>
 
         <h2>Tax</h2>
         <label for="tax_rate">Tax Rate (as decimal):</label>
