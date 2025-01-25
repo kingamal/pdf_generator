@@ -1,7 +1,5 @@
-from flask import Flask, request, jsonify, send_file
 from fpdf import FPDF
 from io import BytesIO
-import json
 
 def calculate_totals(items, tax_rate):
     subtotal = sum(item['quantity'] * item['unit_price'] for item in items)
@@ -71,24 +69,3 @@ def _add_totals(pdf, items, tax_rate):
     pdf.ln(10)
     pdf.cell(150, 10, 'Total:', align='R')
     pdf.cell(40, 10, f"${total:.2f}", align='C')
-
-app = Flask(__name__)
-
-@app.route('/generate_invoice', methods=['POST'])
-def generate_invoice_endpoint():
-    try:
-        data = request.json
-        if not data:
-            return jsonify({"error": "No data provided"}), 400
-
-        pdf_buffer = generate_invoice(data)
-        return send_file(pdf_buffer, mimetype='application/pdf', as_attachment=True, download_name='invoice.pdf')
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/')
-def home():
-    return jsonify({"message": "Welcome to the Invoice Generator API!"})
-
-if __name__ == '__main__':
-    app.run(debug=True)
