@@ -12,11 +12,11 @@
             const newRow = `
                 <div id="item-row-${itemIndex}">
                     <label for="item${itemIndex}_desc">Item ${itemIndex} Description:</label>
-                    <input type="text" id="item${itemIndex}_desc" name="item${itemIndex}_desc"><br>
+                    <input type="text" id="item${itemIndex}_desc" name="item${itemIndex}_desc" required><br>
                     <label for="item${itemIndex}_qty">Item ${itemIndex} Quantity:</label>
-                    <input type="number" id="item${itemIndex}_qty" name="item${itemIndex}_qty"><br>
+                    <input type="number" id="item${itemIndex}_qty" name="item${itemIndex}_qty" required><br>
                     <label for="item${itemIndex}_price">Item ${itemIndex} Unit Price:</label>
-                    <input type="number" step="0.01" id="item${itemIndex}_price" name="item${itemIndex}_price"><br>
+                    <input type="number" step="0.01" id="item${itemIndex}_price" name="item${itemIndex}_price" required><br>
                     <button type="button" onclick="removeItemRow(${itemIndex})">Remove</button>
                     <br><br>
                 </div>
@@ -31,11 +31,37 @@
                 row.remove();
             }
         }
+
+        function fillBusinessDetails() {
+            const selector = document.getElementById('business_selector');
+            const businessName = selector.value;
+            const businessData = businesses[businessName];
+
+            if (businessData) {
+                document.getElementById('business_name').value = businessName;
+                document.getElementById('business_address').value = businessData.address;
+            }
+        }
+
+        const businesses = {
+            "Tech Solutions Inc.": {
+                "address": "123 Innovation Drive, Tech City, TX 75001"
+            },
+            "Creative Minds Co.": {
+                "address": "456 Creative Avenue, Imagination City, CA 94016"
+            }
+        };
     </script>
 </head>
 <body>
     <h1>Invoice Generator</h1>
     <form method="POST">
+        <h2>Select Business</h2>
+        <select id="business_selector" name="business_selector" onchange="fillBusinessDetails()">
+            <option value="Tech Solutions Inc.">Tech Solutions Inc.</option>
+            <option value="Creative Minds Co.">Creative Minds Co.</option>
+        </select><br><br>
+
         <h2>Business Info</h2>
         <label for="business_name">Business Name:</label>
         <input type="text" id="business_name" name="business_name" required><br>
