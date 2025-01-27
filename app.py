@@ -2,8 +2,14 @@ from flask import Flask, request, jsonify, send_file, render_template
 from invoice_generator import generate_invoice
 from io import BytesIO
 import traceback
+import os
+import uuid
 
 app = Flask(__name__)
+
+invoices_directory = 'invoices'
+if not os.path.exists(invoices_directory):
+    os.makedirs(invoices_directory)
 
 def validate_invoice_data(data):
     required_fields = ['business_name', 'business_address', 'customer_name', 'customer_address', 'items', 'tax_rate']
@@ -16,6 +22,15 @@ def validate_invoice_data(data):
         if not all(key in item for key in ['description', 'quantity', 'unit_price']):
             raise ValueError("Each item must contain 'description', 'quantity', and 'unit_price'")
 
+@app.route('/get_invoice/<filename>', methods=['GET'])
+def get_saved_invoice(filename):
+    try:
+        filepath = os.path.join(invoices_directory, filename)
+        if not os.path.exists(filepath):
+            return jsonify({"error": "Invoice not found"}), 404
+        return send_file(filepath, mimetype='application/pdf')
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/generate_invoice', methods=['POST'])
 def generate_invoice_endpoint():
@@ -29,15 +44,22 @@ def generate_invoice_endpoint():
         pdf_buffer = generate_invoice(data)
         pdf_buffer.seek(0)
 
+        unique_filename = f"{uuid.uuid4()}.pdf"
+        filepath = os.path.join(invoices_directory, unique_filename)
+
+        with open(filepath, 'wb') as f:
+            f.write(pdf_buffer.getvalue())
+
         return send_file(
             pdf_buffer,
             mimetype='application/pdf',
             as_attachment=True,
-            download_name='invoice.pdf'
+            download_name=unique_filename
         )
+    except ValueError as ve:
+        return jsonify({"error": str(ve)}), 400
     except Exception as e:
-        print(traceback.format_exc())
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Internal server error: {str(e)}"}), 500
 
 @app.route('/form', methods=['GET', 'POST'])
 def invoice_form():
@@ -62,7 +84,15 @@ def invoice_form():
                 "tax_rate": float(request.form['tax_rate'])
             }
             pdf_buffer = generate_invoice(data)
-            return send_file(pdf_buffer, mimetype='application/pdf', as_attachment=True, download_name='invoice.pdf')
+            pdf_buffer.seek(0)
+
+            unique_filename = f"{uuid.uuid4()}.pdf"
+            filepath = os.path.join(invoices_directory, unique_filename)
+
+            with open(filepath, 'wb') as f:
+                f.write(pdf_buffer.getvalue())
+
+            return send_file(filepath, mimetype='application/pdf', as_attachment=True, download_name=unique_filename)
         except Exception as e:
             print(traceback.format_exc())
             return jsonify({"error": str(e)}), 400
