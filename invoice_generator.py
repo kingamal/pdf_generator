@@ -8,18 +8,22 @@ def calculate_totals(items, tax_rate):
     return subtotal, tax, total
 
 def generate_invoice(data):
-    pdf = FPDF()
-    pdf.add_page()
-    _add_business_info(pdf, data['business_name'], data['business_address'])
-    _add_customer_info(pdf, data['customer_name'], data['customer_address'])
-    _add_items_table(pdf, data['items'], data['tax_rate'])
-    _add_totals(pdf, data['items'], data['tax_rate'])
-    
-    pdf_buffer = BytesIO()
-    pdf_output = pdf.output(dest='S').encode('latin1')
-    pdf_buffer.write(pdf_output)
-    pdf_buffer.seek(0)
-    return pdf_buffer
+    try:
+        pdf = FPDF()
+        pdf.add_page()
+        _add_business_info(pdf, data['business_name'], data['business_address'])
+        _add_customer_info(pdf, data['customer_name'], data['customer_address'])
+        _add_items_table(pdf, data['items'], data['tax_rate'])
+        _add_totals(pdf, data['items'], data['tax_rate'])
+        
+        pdf_buffer = BytesIO()
+        pdf_output = pdf.output(dest='S').encode('latin1')
+        pdf_buffer.write(pdf_output)
+        pdf_buffer.seek(0)
+        return pdf_buffer
+    except Exception as e:
+        print(f"Error generating invoice: {e}")
+        raise
 
 def _add_business_info(pdf, business_name, business_address):
     pdf.set_font('Arial', 'B', 16)
