@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoices</title>
+</head>
+<body>
+    <h1>Your Invoices</h1>
+    <ul>
+        {% for invoice in invoices %}
+            <li><a href="{{ url_for('get_saved_invoice', filename=invoice.filename) }}">{{ invoice.filename }}</a></li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('invoice_form') }}">Generate New Invoice</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>
