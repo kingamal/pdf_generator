@@ -17,7 +17,7 @@ def generate_invoice(data):
         _add_totals(pdf, data['items'], data['tax_rate'])
         
         pdf_buffer = BytesIO()
-        pdf_output = pdf.output(dest='S').encode('latin1')
+        pdf_output = pdf.output(dest='S').encode('utf-8')
         pdf_buffer.write(pdf_output)
         pdf_buffer.seek(0)
         return pdf_buffer
