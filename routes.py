@@ -22,7 +22,7 @@ def create_routes(app):
             user = User.query.filter_by(username=username).first()
             if user and user.password == password:
                 login_user(user)
-                return redirect(url_for('invoice_form'))
+                return redirect(url_for('user_panel'))
             else:
                 flash('Login Unsuccessful. Please check username and password', 'danger')
         return render_template('login.html')
@@ -31,7 +31,7 @@ def create_routes(app):
     @login_required
     def logout():
         logout_user()
-        return redirect(url_for('login'))
+        return redirect(url_for('home'))
 
     @app.route('/register', methods=['GET', 'POST'])
     def register():
@@ -111,4 +111,11 @@ def create_routes(app):
 
     @app.route('/')
     def home():
-        return jsonify({"message": "Welcome to the Invoice Generator API!"})
+        if current_user.is_authenticated:
+            return redirect(url_for('user_panel'))
+        return render_template('home.html')
+
+    @app.route('/user_panel')
+    @login_required
+    def user_panel():
+        return render_template('user_panel.html')
