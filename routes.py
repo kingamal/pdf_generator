@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, send_file, render_template, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user, current_user
-from models import db, User, Invoice
+from models import db, User, Business, Invoice
 from invoice_generator import generate_invoice
 from utils import validate_invoice_data, save_pdf_to_file
 import uuid
@@ -48,6 +48,7 @@ def create_routes(app):
     @app.route('/form', methods=['GET', 'POST'])
     @login_required
     def invoice_form():
+        businesses = Business.query.all()
         if request.method == 'POST':
             try:
                 items = []
@@ -60,9 +61,12 @@ def create_routes(app):
                             "unit_price": float(request.form.get(f"item{index}_price", 0.0))
                         })
 
+                business_id = request.form['business_id']
+                business = Business.query.get(business_id)
+
                 data = {
-                    "business_name": request.form['business_name'],
-                    "business_address": request.form['business_address'],
+                    "business_name": business.name,
+                    "business_address": business.address,
                     "customer_name": request.form['customer_name'],
                     "customer_address": request.form['customer_address'],
                     "items": items,
@@ -89,7 +93,7 @@ def create_routes(app):
                 logger.error(f"Error generating invoice: {e}")
                 return jsonify({"error": str(e)}), 400
 
-        return render_template('form.html')
+        return render_template('form.html', businesses=businesses)
 
     @app.route('/invoices')
     @login_required
@@ -119,3 +123,17 @@ def create_routes(app):
     @login_required
     def user_panel():
         return render_template('user_panel.html')
+
+    @app.route('/businesses', methods=['GET', 'POST'])
+    @login_required
+    def manage_businesses():
+        if request.method == 'POST':
+            name = request.form['name']
+            address = request.form['address']
+            business = Business(name=name, address=address)
+            db.session.add(business)
+            db.session.commit()
+            flash('Business added successfully!', 'success')
+            return redirect(url_for('manage_businesses'))
+        businesses = Business.query.all()
+        return render_template('businesses.html', businesses=businesses)
