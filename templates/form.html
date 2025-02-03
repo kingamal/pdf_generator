@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Generator</title>
+    <title>Generate Invoice</title>
     <script>
         let itemIndex = 2;
 
@@ -31,42 +31,17 @@
                 row.remove();
             }
         }
-
-        function fillBusinessDetails() {
-            const selector = document.getElementById('business_selector');
-            const businessName = selector.value;
-            const businessData = businesses[businessName];
-
-            if (businessData) {
-                document.getElementById('business_name').value = businessName;
-                document.getElementById('business_address').value = businessData.address;
-            }
-        }
-
-        const businesses = {
-            "Tech Solutions Inc.": {
-                "address": "123 Innovation Drive, Tech City, TX 75001"
-            },
-            "Creative Minds Co.": {
-                "address": "456 Creative Avenue, Imagination City, CA 94016"
-            }
-        };
     </script>
 </head>
 <body>
-    <h1>Invoice Generator</h1>
+    <h1>Generate Invoice</h1>
     <form method="POST">
         <h2>Select Business</h2>
-        <select id="business_selector" name="business_selector" onchange="fillBusinessDetails()">
-            <option value="Tech Solutions Inc.">Tech Solutions Inc.</option>
-            <option value="Creative Minds Co.">Creative Minds Co.</option>
+        <select id="business_id" name="business_id" required>
+            {% for business in businesses %}
+                <option value="{{ business.id }}">{{ business.name }}</option>
+            {% endfor %}
         </select><br><br>
-
-        <h2>Business Info</h2>
-        <label for="business_name">Business Name:</label>
-        <input type="text" id="business_name" name="business_name" required><br>
-        <label for="business_address">Business Address:</label>
-        <input type="text" id="business_address" name="business_address" required><br>
 
         <h2>Customer Info</h2>
         <label for="customer_name">Customer Name:</label>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Businesses</title>
+</head>
+<body>
+    <h1>Manage Businesses</h1>
+    <form method="POST">
+        <label for="name">Business Name:</label>
+        <input type="text" id="name" name="name" required><br>
+        <label for="address">Business Address:</label>
+        <input type="text" id="address" name="address" required><br>
+        <button type="submit">Add Business</button>
+    </form>
+    <h2>Existing Businesses</h2>
+    <ul>
+        {% for business in businesses %}
+            <li>{{ business.name }} - {{ business.address }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('user_panel') }}">Back to User Panel</a>
+</body>
+</html>
