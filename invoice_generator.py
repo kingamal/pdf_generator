@@ -11,13 +11,15 @@ def generate_invoice(data):
     try:
         pdf = FPDF()
         pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.set_font('Arial', '', 14)
         _add_business_info(pdf, data['business_name'], data['business_address'])
         _add_customer_info(pdf, data['customer_name'], data['customer_address'])
         _add_items_table(pdf, data['items'], data['tax_rate'])
         _add_totals(pdf, data['items'], data['tax_rate'])
         
         pdf_buffer = BytesIO()
-        pdf_output = pdf.output(dest='S').encode('utf-8')
+        pdf_output = pdf.output(dest='S').encode('latin1')
         pdf_buffer.write(pdf_output)
         pdf_buffer.seek(0)
         return pdf_buffer
