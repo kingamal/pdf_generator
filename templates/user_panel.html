@@ -1,15 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Panel</title>
-</head>
-<body>
-    <h1>User Panel</h1>
-    <a href="{{ url_for('invoices') }}">View Invoices</a>
-    <a href="{{ url_for('invoice_form') }}">Generate New Invoice</a>
-    <a href="{{ url_for('manage_businesses') }}">Manage Businesses</a>
-    <a href="{{ url_for('logout') }}">Logout</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}User Panel{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">User Panel</h1>
+    <div class="text-center mt-4">
+        <a href="{{ url_for('invoices') }}" class="btn btn-primary">View Invoices</a>
+        <a href="{{ url_for('invoice_form') }}" class="btn btn-secondary">Generate New Invoice</a>
+        <a href="{{ url_for('manage_businesses') }}" class="btn btn-info">Manage Businesses</a>
+        <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+    </div>
+{% endblock %}
