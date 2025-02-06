@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_scss import Scss
 from dotenv import load_dotenv
 import logging
 import os
@@ -20,6 +21,8 @@ login_manager.login_view = 'login'
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+Scss(app, static_dir='static', asset_dir='assets/scss')
 
 from routes import create_routes
 
