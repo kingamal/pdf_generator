@@ -49,6 +49,7 @@ def create_routes(app):
     @login_required
     def invoice_form():
         businesses = Business.query.all()
+
         if request.method == 'POST':
             try:
                 items = []
@@ -61,12 +62,22 @@ def create_routes(app):
                             "unit_price": float(request.form.get(f"item{index}_price", 0.0))
                         })
 
-                business_id = request.form['business_id']
-                business = Business.query.get(business_id)
+                if 'new_business_name' in request.form and request.form['new_business_name']:
+                    business_name = request.form['new_business_name']
+                    business_address = request.form['new_business_address']
+                    if 'save_business' in request.form and request.form['save_business'] == 'on':
+                        new_business = Business(name=business_name, address=business_address)
+                        db.session.add(new_business)
+                        db.session.commit()
+                else:
+                    business_id = request.form['business_id']
+                    business = Business.query.get(business_id)
+                    business_name = business.name
+                    business_address = business.address
 
                 data = {
-                    "business_name": business.name,
-                    "business_address": business.address,
+                    "business_name": business_name,
+                    "business_address": business_address,
                     "customer_name": request.form['customer_name'],
                     "customer_address": request.form['customer_address'],
                     "items": items,
