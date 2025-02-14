@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file, render_template, redirect, url_for, flash
+from flask import Flask, request, jsonify, send_file, render_template, redirect, url_for, flash, url_for
 from flask_login import login_user, login_required, logout_user, current_user
 from models import db, User, Business, Invoice
 from invoice_generator import generate_invoice
@@ -109,8 +109,12 @@ def create_routes(app):
     @app.route('/invoices')
     @login_required
     def invoices():
-        user_invoices = Invoice.query.filter_by(user_id=current_user.id).all()
-        return render_template('invoices.html', invoices=user_invoices)
+        page = request.args.get('page', 1, type=int)
+        per_page = 10
+        user_invoices = Invoice.query.filter_by(user_id=current_user.id).paginate(page=page, per_page=per_page, error_out=False)
+        next_url = url_for('invoices', page=user_invoices.next_num) if user_invoices.has_next else None
+        prev_url = url_for('invoices', page=user_invoices.prev_num) if user_invoices.has_prev else None
+        return render_template('invoices.html', invoices=user_invoices.items, next_url=next_url, prev_url=prev_url)
 
     @app.route('/get_invoice/<filename>', methods=['GET'])
     @login_required
